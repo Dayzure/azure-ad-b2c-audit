@@ -2,7 +2,7 @@
 
 This repository aims to provide useful queries around Azure AD B2C Audit Logs.
 
-Please, remember that Azure AD B2C sign-in data is actually located in the **audit** log, not in ***user sign-in** log.
+Please, remember that Azure AD B2C sign-in data is actually located in the **audit** log, not in **user sign-in** log.
 
 More information on the categories and different field/values relevant to Azure AD B2C Audit Logs can be found [here](http://bit.ly/b2c-audit-fields).
 
@@ -157,5 +157,6 @@ And the result would be formatted that way:
 ## Azure Log Analytics Workbook
 
 Last, but not least, we can pack the various queries in Azure Log Analytics Workbook and have it visually hint us about the authentications and MAUs.
-A sample Workbook is provided in this repository: .
+A sample Workbook is provided in this repository: [b2c-audits.json](./b2c-audits.json). This is a *gallery template* not an *arm template*.
+
 
