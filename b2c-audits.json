@@ -1,0 +1,62 @@
+{
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "let auths = AuditLogs \n        | where TimeGenerated > ago(30d)\n        | where AADTenantId == \"<replace-with-your-tenant-id>\" \n            and LoggedByService == \"B2C\" \n            and Result == \"success\" \n            and Category == \"Authentication\" \n            and OperationName in (\"Issue an id_token to the application\",\"Exchange token\",\"Issue an authorization code to the application\",\"Issue an access token to the application\")\n        | order by TimeGenerated desc \n        | summarize Label = 'Authentications', Counter = count();\nlet maus = AuditLogs \n        | where TimeGenerated > ago(30d)\n        | where AADTenantId == \"<replace-with-your-tenant-id>\" \n            and LoggedByService == \"B2C\" \n            and Result == \"success\" \n            and Category == \"Authentication\" \n            and OperationName in (\"Issue an id_token to the application\",\"Exchange token\",\"Issue an authorization code to the application\",\"Issue an access token to the application\")\n        | order by TimeGenerated desc \n        | summarize Label = 'MAUs', Counter = dcount(tostring(TargetResources[0].id));\nauths \n| union maus\n| render piechart;",
+          "size": 3,
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "name": "Number of Authentications vs MAUs in last 30 days"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AuditLogs \r\n| where TimeGenerated > ago(30d)\r\n| where AADTenantId == \"<replace-with-your-tenant-id>\" \r\n    and LoggedByService == \"B2C\" \r\n    and Result == \"success\" \r\n    and Category == \"Authentication\" \r\n    and OperationName in (\"Issue an id_token to the application\",\"Exchange token\",\"Issue an authorization code to the application\",\"Issue an access token to the application\")\r\n| order by TimeGenerated desc \r\n| summarize total_authn = count() by OperationName\r\n| render barchart",
+          "size": 0,
+          "timeContext": {
+            "durationMs": 86400000
+          },
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "name": "Authentications by type in last 30 days"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "AuditLogs \r\n| where TimeGenerated > ago(30d)\r\n| where AADTenantId == \"<replace-with-your-tenant-id>\" \r\n    and LoggedByService == \"B2C\" \r\n    and Result == \"success\" \r\n    and Category == \"Authentication\" \r\n    and OperationName in (\"Issue an id_token to the application\",\"Exchange token\",\"Issue an authorization code to the application\",\"Issue an access token to the application\")\r\n| order by TimeGenerated desc \r\n| summarize total_authn = count() by tostring(TargetResources[0].id)",
+          "size": 0,
+          "timeContext": {
+            "durationMs": 86400000
+          },
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "gridSettings": {
+            "sortBy": [
+              {
+                "itemKey": "total_authn",
+                "sortOrder": 2
+              }
+            ]
+          },
+          "sortBy": [
+            {
+              "itemKey": "total_authn",
+              "sortOrder": 2
+            }
+          ]
+        },
+        "name": "MAUs in last 30 days"
+      }
+    ],
+    "fallbackResourceIds": [
+      "/subscriptions/08edba72-f736-4467-9d35-7032f38ebce6/resourceGroups/monitor-all/providers/Microsoft.OperationalInsights/workspaces/csa-staykov-logs-ws"
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
