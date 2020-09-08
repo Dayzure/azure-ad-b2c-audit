@@ -123,33 +123,24 @@ we would need to craft a different query, so that we have two records with two c
 The following query gives us a result suitable for visualisations:
 
 ```
-    let auths = AuditLogs 
-            | where TimeGenerated > ago(30d)
-            | where AADTenantId == "2a3989d7-55b3-439e-ab19-09a33efe8fbf" 
-                and LoggedByService == "B2C" 
-                and Result == "success" 
-                and Category == "Authentication" 
-                and OperationName in ("Issue an id_token to the application","Exchange token","Issue an authorization code to the application","Issue an access token to the application")
-            | order by TimeGenerated desc 
-            | summarize Label = 'Authentications', Counter = count();
-    let maus = AuditLogs 
-            | where TimeGenerated > ago(30d)
-            | where AADTenantId == "2a3989d7-55b3-439e-ab19-09a33efe8fbf" 
-                and LoggedByService == "B2C" 
-                and Result == "success" 
-                and Category == "Authentication" 
-                and OperationName in ("Issue an id_token to the application","Exchange token","Issue an authorization code to the application","Issue an access token to the application")
-            | order by TimeGenerated desc 
-            | summarize Label = 'MAUs', Counter = dcount(tostring(TargetResources[0].id));
-    auths 
-    | union maus;
+    AuditLogs 
+        | where TimeGenerated > ago(30d)
+        | where AADTenantId == "<replace-with-your-tenant-id>" 
+            and LoggedByService == "B2C" 
+            and Result == "success" 
+            and Category == "Authentication" 
+            and OperationName in ("Issue an id_token to the application","Exchange token","Issue an authorization code to the application","Issue an access token to the application")
+        | order by TimeGenerated desc 
+        | summarize Authentications = count(), MAUs = dcount(tostring(TargetResources[0].id))
+        | evaluate narrow()
+        | project Column, Value
 ```
 
 Thanks [Hans Peter](https://bit.ly/3haGlJ8), for helping out on this part!
 
 And the result would be formatted that way:
 
-| Label | Counter |
+| Column | Value |
 | ------------- |:-------------:| 
 | Authentications      | 148,258 |
 | MAUs      | 17,310 |
